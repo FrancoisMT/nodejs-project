@@ -1,41 +1,41 @@
-version: '3.8'
+name: CI/CD Pipeline
 
-services:
-  db:
-    image: mariadb:10.5
-    container_name: mariadb_db
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "9999:3306" 
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - app_network
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
-  api:
-    build: .
-    container_name: node_api
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db  
-      DB_PORT: 3306
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-    ports:
-      - "3000:3000"  
-    networks:
-      - app_network
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-networks:
-  app_network:
-    driver: bridge
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  
 
-volumes:
-  mariadb_data:
-    driver: local
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run unit tests
+      run: npx jest
+      env:
+        CI: true
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v1
+      with:
+        sonar-token: ${{ secrets.NODEJS_PROJECT_SECRET }}
+        args: >
+          -Dsonar.projectKey=your_project_key
+          -Dsonar.organization=your_organization_key
+          -Dsonar.sources=src
+          -Dsonar.tests=tests
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov-report/index.js
