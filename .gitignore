@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dossier de build
+dist/
+
+# Fichiers de configuration IDE
+.vscode/
+.idea/
+
+# Fichiers de dépendances lock (si tu utilises yarn ou npm)
+package-lock.json
+yarn.lock
+
+# Fichiers temporaires
+*.swp
+.DS_Store
