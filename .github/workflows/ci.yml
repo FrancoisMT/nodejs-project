@@ -28,3 +28,8 @@ jobs:
       run: npm test  
       env:
         CI: true  
+    
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v1
+      with:
+        sonar-token: ${{ secrets.NODEJS_PROJECT_SECRET }}
